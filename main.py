@@ -62,14 +62,13 @@ def put_academic_performance(arr_studiens_hbase):
     #hbase_kursova.put_data(i.name,"srednii bal","grades","academic_performance",srednii_bal)
     #pushsql(srednii_bal) dobavlyem srednii bal v sql
 
-def put_number_of_sesion_subject(arr_studiens_hbase):
+def number_of_sesion_subject(arr_studiens_hbase):
     arr=[]
     for i in arr_studiens_hbase:
         number_of_subjects = len(i.session_subjects)
         arr.append(number_of_subjects)
     num = max(arr)
     return num
-    #putsql put(num)
 
 def give_scholarship(stu,num_of_session,group):
     type_of_scholarship = 0
@@ -88,13 +87,6 @@ def give_scholarship(stu,num_of_session,group):
         type_of_scholarship = 1 
 
     sql_set_scholarship(type_of_scholarship)
-
-    
-    
-    
-    
-    
-
 
 
 
