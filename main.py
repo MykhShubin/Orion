@@ -16,30 +16,26 @@ class student:
         self.subjects_sesiion = subjects_sesiion
 
 class student_in_hbase:
-    def __init__(self,name,subjects = {},sesion_subjects={})-> None:
+    def __init__(self,name):
         self.name = name
-        self.subjects = subjects
-        self.session_subjects = sesion_subjects
+        self.subjects = {}
+        self.session_subjects = {}
     
-    def add_subjects(self,name,main_grade,session_grade):
-        self.subjects[name] = main_grade
+    def add_subjects(self,subject,main_grade,session_grade):
+        self.subjects[subject] = main_grade
         if session_grade != -1:
-            self.session_subjects[name] = session_grade
+            self.session_subjects[subject] = session_grade
 
 
 def read_data_hbase(arr_studiens_hbase):
     arr_hbase = hbase_kursova.conn.tables()
     for i in arr_hbase:
-        stu = student_in_hbase(i)
+        stu = student_in_hbase(i.decode())
         array_of_subjectes = []
-        hbase_kursova.read_data(i,array_of_subjectes)
+        hbase_kursova.read_data(i, array_of_subjectes)
         for k in array_of_subjectes:
             stu.add_subjects(k.name,k.main_grade,k.sesion_grade)
         arr_studiens_hbase.append(stu)
-
-def print_data_hbase(arr_studiens_hbase):
-    for i in arr_studiens_hbase:
-        print("name is ",i.name," dict 1 is ",i.subjects, " dict 2 is ", i.session_subjects)
 
 def delete_all_tables_hbase():
     for i in hbase_kursova.conn.tables():
@@ -55,22 +51,22 @@ def creating_tables_and_adding_data(array):
         for session_subject,grage in i.subjects_sesiion.items():
             hbase_kursova.put_data(i.name,session_subject,"grades","session_grade",str(grage))
 
+#def give_scholarship(stu):
+
+
 
 array = [student("Oleksandr",1,"DA-02",122,3,0,True,{"tik":25,"sbd":30},{"sbd":30}),
         student("Misha",2,"DA-02",122,3,0,True,{"tik":38,"sbd":23},{"sbd":80}),
         student("Andrii",3,"DA-02",122,3,0,True,{"tik":49,"sbd":22},{"sbd":67})]
     
-
 creating_tables_and_adding_data(array)
-#postgreSQL.show_data()
-#postgreSQL.exit()
+postgreSQL.show_data()
+postgreSQL.exit()
 arr_studiens_hbase =[]
 read_data_hbase(arr_studiens_hbase)
-print_data_hbase(arr_studiens_hbase)
-
-
+for i in arr_studiens_hbase:
+    print("name is ",i.name," dict 1 is ",i.subjects, " dict 2 is ", i.session_subjects)
 print(hbase_kursova.conn.tables())
 
 delete_all_tables_hbase()
-
 
