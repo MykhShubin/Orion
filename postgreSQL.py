@@ -49,6 +49,29 @@ def show_data():
               + str(entry[3]) + "; Specialty:" + str(entry[4]) + "; GPA:" + str(entry[5]) + "; Public work:" + str(
             entry[6]))
 
+def get_data(id:int):
+    atr_list = []
+    cursor.execute("SELECT * from students WHERE ID = %s",(id,))
+    mlist = cursor.fetchall()
+    for i in range(0,7):
+        atr_list.append(mlist[0][i])
+    return atr_list
+
+#успеваемость,количество экз, прожив в общаге
+def alter_table():
+    cursor.execute('''ALTER TABLE students
+    ADD COLUMN EX_NUM INT,
+    ADD COLUMN LIV BOOLEAN''')
+
+def fill_gpa(id:int,gpa:float):
+    cursor.execute('UPDATE students SET GPA = %s WHERE ID = %s',(gpa,id,))
+
+def fill_ex_num(id:int,ex_num:int):
+    cursor.execute('UPDATE students SET EX_NUM = %s WHERE ID = %s',(ex_num,id,))
+
+def fill_liv(id:int,liv:bool):
+    cursor.execute('UPDATE students SET LIV = %s WHERE ID = %s',(liv,id,))
+
 def exit():
     conn.commit()
     conn.close()
@@ -56,8 +79,12 @@ def exit():
 cursor = conn.cursor()
 #create_db()
 #put_data(1,'Andriy Dyniak','DA-02',3,122,80,True)
+#put_data(2,'Mykhailo Shubin','DA-02',3,122,80,True)
+#put_data(3,'Alexander Kovalenko','DA-02',3,122,80,True)
+#alter_table()
+#fill_gpa(1,70)
 #show_data()
 #delete_data(1)
 #show_data()
-#exit()
-
+#print(get_data(2))
+exit()
