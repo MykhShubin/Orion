@@ -1,0 +1,33 @@
+import couchdb
+
+db = couchdb.Server('http://localhost:5984/')['university']
+
+# Створення нового документу
+def add_document(db, doc_id, doc_rev, doc):
+    try:
+        db.put(doc, doc_id, doc_rev)
+        print("Document added successfully")
+    except couchdb.http.ResourceConflict:
+        print("Document with this ID already exists")
+
+doc = {
+    "_id": "doc1",
+    "name": "Andriy Dyniak",
+    "session": 95,
+    "averagescore": 90
+}
+# Оновлення документу
+doc['age'] = 19
+db.save(doc)
+
+# Видалення документу
+db.delete(doc)
+
+# зчитайте документ з бази даних:
+doc = db['1']
+# видаліть потрібну інформацію з документу:
+del doc['name']
+# бережіть змінений документ у базі даних:
+add_document(db, doc)
+
+db.update(doc, field_name='name')
