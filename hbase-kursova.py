@@ -1,5 +1,4 @@
 import happybase
-
 conn = happybase.Connection()
 conn.open()
 
@@ -26,9 +25,12 @@ def put_data(table_name:str,key:str,family:str,columb:str,value:str):
 def read_data(table_name,array):
     table = conn.table(table_name)
     for key,data in table.scan():
-        subject1 = subject(key.decode(),int(data[b'grades:main_grade'].decode()),int(data[b'grades:session_grade'].decode()))
+        if(len(data)==2):
+            subject1 = subject(key.decode(),int(data[b'grades:main_grade'].decode()),int(data[b'grades:session_grade'].decode()))
+        else:
+            subject1 = subject(key.decode(),int(data[b'grades:main_grade'].decode()),-1)
         array.append(subject1)
-        print(key,data)
+        #print(key,data)
         
     print()
 
@@ -40,14 +42,14 @@ def delete_data(table_name,key):
     table = conn.table(table_name)
     table.delete(key)
 
+#delete_table("student_name")
+# create_table("student_name","grades")
+# print(conn.tables())
+# array_of_subjectes = []
+# put_data("student_name","bd","grades","main_grade","70")
+# put_data("student_name","bd","grades","session_grade","86")
+# read_data("student_name",array_of_subjectes)
+# for i in array_of_subjectes:
+#     print("name is ", i.name, " main grade is ",i.main_grade," session grade is ", i.sesion_grade)
 
-#create_table("student_name","grades")
-print(conn.tables())
-array_of_subjectes = []
-put_data("student_name","bd","grades","main_grade","70")
-put_data("student_name","bd","grades","session_grade","86")
-read_data("student_name",array_of_subjectes)
-for i in array_of_subjectes:
-    print("name is ", i.name, " main grade is ",i.main_grade," session grade is ", i.sesion_grade)
-
-delete_table("student_name")
+# delete_table("student_name")
