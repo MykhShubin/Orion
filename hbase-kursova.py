@@ -32,7 +32,6 @@ def read_data(table_name,array):
         array.append(subject1)
         #print(key,data)
         
-    print()
 
 def delete_table(table_name):
     conn.disable_table(table_name)
