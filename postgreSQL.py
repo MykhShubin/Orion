@@ -43,7 +43,7 @@ def delete_data(id:int):
 
 
 def show_data():
-    #cursor.execute('SELECT * FROM students')
+    cursor.execute('SELECT * FROM students')
     mlist = cursor.fetchall()
     print('Students list:')
     for entry in mlist:
@@ -76,8 +76,22 @@ def fill_ex_num(id:int,ex_num:int):
 def fill_liv(id:int,liv:bool):
     cursor.execute('UPDATE students SET LIV = %s WHERE ID = %s',(liv,id,))
 
-def fill_scol(id:int,scol:int):
+def fill_scol(scol:int,id:int):
     cursor.execute('UPDATE students SET SCOLARSHIP = %s WHERE ID = %s', (scol, id,))
+
+def show_step(group:str):
+    atr_list = []
+    cursor.execute("SELECT * from students WHERE ST_GROUP = %s", (group,))
+    mlist = cursor.fetchall()
+    for entry in mlist:
+        if entry[8] == 0:
+            print(entry[1] + ' - no scholarship')
+        elif entry[8] == 1:
+            print(entry[1] + ' - regular scholarship')
+        elif entry[8] == 2:
+            print(entry[1] + ' - raised scholarship')
+        else:
+            print(entry[1],entry[8])
 
 cursor = conn.cursor()
 #create_db()
@@ -90,4 +104,3 @@ cursor = conn.cursor()
 #delete_data(1)
 #show_data()
 #exit()
-
