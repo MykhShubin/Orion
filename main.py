@@ -1,6 +1,6 @@
 #import couchdb_kursova
 import hbase_kursova
-#import postgreSQL
+import postgreSQL
 
 
 class student:
@@ -37,8 +37,18 @@ def read_data_hbase(arr_studiens_hbase):
             stu.add_subjects(k.name,k.main_grade,k.sesion_grade)
         arr_studiens_hbase.append(stu)
 
-def write_data_hbase(array):
+def print_data_hbase(arr_studiens_hbase):
+    for i in arr_studiens_hbase:
+        print("name is ",i.name," dict 1 is ",i.subjects, " dict 2 is ", i.session_subjects)
+
+def delete_all_tables_hbase():
+    for i in hbase_kursova.conn.tables():
+        hbase_kursova.delete_table(i)
+
+def creating_tables_and_adding_data(array):
+    postgreSQL.create_db()
     for i in array:
+        postgreSQL.put_data(i.id,i.name,i.group,i.year,i.speciality,i.srednii_bal,i.pub_work)
         hbase_kursova.create_table(i.name,"grades")
         for main_subject,grage in i.subjects.items():
             hbase_kursova.put_data(i.name,main_subject,"grades","main_grade",str(grage))
@@ -46,22 +56,21 @@ def write_data_hbase(array):
             hbase_kursova.put_data(i.name,session_subject,"grades","session_grade",str(grage))
 
 
-
 array = [student("Oleksandr",1,"DA-02",122,3,0,True,{"tik":25,"sbd":30},{"sbd":30}),
         student("Misha",2,"DA-02",122,3,0,True,{"tik":38,"sbd":23},{"sbd":80}),
         student("Andrii",3,"DA-02",122,3,0,True,{"tik":49,"sbd":22},{"sbd":67})]
     
 
-write_data_hbase(array)
+creating_tables_and_adding_data(array)
+#postgreSQL.show_data()
+#postgreSQL.exit()
 arr_studiens_hbase =[]
 read_data_hbase(arr_studiens_hbase)
+print_data_hbase(arr_studiens_hbase)
 
 
 print(hbase_kursova.conn.tables())
 
-for i in arr_studiens_hbase:
-    print("name is ",i.name," dict 1 is ",i.subjects, " dict 2 is ", i.session_subjects)
+delete_all_tables_hbase()
 
-for i in hbase_kursova.conn.tables():
-    hbase_kursova.delete_table(i)
 
