@@ -15,12 +15,12 @@ def create_db():
     cursor.execute('DROP TABLE IF EXISTS students')
 
     sql = '''CREATE TABLE students(  
-      ID SERIAL PRIMARY KEY ,
+      ID INT PRIMARY KEY ,
       FULL_NAME VARCHAR NOT NULL,
       ST_GROUP VARCHAR NOT NULL,
       ST_YEAR INT,
-      SPECIALTY INT,
-      GPA INT,
+      SPECIALITY INT,
+      GPA FLOAT,
       PUB_WORK BOOLEAN NOT NULL
     )'''
 
@@ -35,10 +35,9 @@ def put_data(id:int, name:str, group:str, year:int, speciality:int,gpa:float,pub
     #print('Table filled successfully...')
 
 
-def delete_data():
-    id_var = 2
-    cursor.execute('DELETE FROM students WHERE ID = ' + str(id_var))
-    print('Entry with id = ' + str(id_var) + ' deleted...')
+def delete_data(id:int):
+    cursor.execute('DELETE FROM students WHERE ID = %s',(id,))
+    print('Entry with id = ' + str(id) + ' deleted...')
 
 
 def show_data():
@@ -50,12 +49,15 @@ def show_data():
               + str(entry[3]) + "; Specialty:" + str(entry[4]) + "; GPA:" + str(entry[5]) + "; Public work:" + str(
             entry[6]))
 
+def exit():
+    conn.commit()
+    conn.close()
 
 cursor = conn.cursor()
-create_db()
-put_data(1,'Andriy Dyniak','DA-02',3,122,80,True)
-show_data()
-delete_data()
-show_data()
-conn.commit()
-conn.close()
+#create_db()
+#put_data(1,'Andriy Dyniak','DA-02',3,122,80,True)
+#show_data()
+#delete_data(1)
+#show_data()
+#exit()
+
