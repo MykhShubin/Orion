@@ -2,7 +2,7 @@ import psycopg2
 
 # connection establishment
 conn = psycopg2.connect(
-    database='uni',
+    database='postgres',
     user='postgres',
     password='postgres',
     host='localhost',
