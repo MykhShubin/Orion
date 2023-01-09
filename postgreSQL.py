@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.extensions import AsIs
 
 # connection establishment
 conn = psycopg2.connect(
@@ -27,15 +28,11 @@ def create_db():
     print("Table created successfully...")
 
 
-def fill_data():
-    cursor.execute('''INSERT INTO students (FULL_NAME,ST_GROUP,ST_YEAR,SPECIALTY,GPA,PUB_WORK) 
-    VALUES ('Mykhailo Shubin','DA-02', 3, 122, 75, TRUE)''')
-    cursor.execute('''INSERT INTO students (FULL_NAME,ST_GROUP,ST_YEAR,SPECIALTY,GPA,PUB_WORK) 
-    VALUES ('Andriy Dyniak','DA-02', 3, 122, 80, FALSE)''')
-    cursor.execute('''INSERT INTO students (FULL_NAME,ST_GROUP,ST_YEAR,SPECIALTY,GPA,PUB_WORK) 
-    VALUES ('Alexander Kovalenko','DA-02', 3, 122, 85, TRUE)''')
+def put_data(id:int, name:str, group:str, year:int, speciality:int,gpa:float,pub_work:bool):
+    cursor.execute('''INSERT INTO students (ID,FULL_NAME,ST_GROUP,ST_YEAR,SPECIALITY,GPA,PUB_WORK) 
+    VALUES (%s, %s,%s, %s, %s, %s, %s)''',(AsIs(id),name,group,AsIs(year),AsIs(speciality),AsIs(gpa),AsIs(pub_work)))
 
-    print('Table filled successfully...')
+    #print('Table filled successfully...')
 
 
 def delete_data():
@@ -56,7 +53,7 @@ def show_data():
 
 cursor = conn.cursor()
 create_db()
-fill_data()
+put_data(1,'Andriy Dyniak','DA-02',3,122,80,True)
 show_data()
 delete_data()
 show_data()
