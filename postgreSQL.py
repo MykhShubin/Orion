@@ -15,6 +15,7 @@ def exit():
     conn.close()
 
 def create_db():
+    cursor.execute('DROP VIEW IF EXISTS sorted_students')
     cursor.execute('DROP TABLE IF EXISTS students')
 
     sql = '''CREATE TABLE students(  
@@ -80,8 +81,7 @@ def fill_scol(scol:int,id:int):
     cursor.execute('UPDATE students SET SCOLARSHIP = %s WHERE ID = %s', (scol, id,))
 
 def show_step(group:str):
-    atr_list = []
-    cursor.execute("SELECT * from students WHERE ST_GROUP = %s", (group,))
+    cursor.execute('SELECT * from students WHERE ST_GROUP = %s', (group,))
     mlist = cursor.fetchall()
     for entry in mlist:
         if entry[8] == 0:
@@ -93,14 +93,24 @@ def show_step(group:str):
         else:
             print(entry[1],entry[8])
 
+def show_group(group:str):
+    cursor.execute('SELECT * from students WHERE ST_GROUP = %s', (group,))
+    mlist = cursor.fetchall()
+    print("Group "+group+":")
+    for entry in mlist:
+        print(entry[1])
+
+def order_alph():
+    cursor.execute('''CREATE VIEW sorted_students
+    AS
+    SELECT * 
+    FROM students
+    ORDER BY FULL_NAME ASC''')
+    cursor.execute('SELECT * FROM sorted_students')
+    #cursor.execute('SELECT * FROM students ORDER BY FULL_NAME DESC NULLS LAST')
+    mlist = cursor.fetchall()
+    cursor.execute('DROP VIEW IF EXISTS sorted_students')
+    return mlist
+
 cursor = conn.cursor()
-#create_db()
-#put_data(1,'Andriy Dyniak','DA-02',3,122,True)
-#put_data(2,'Mykhailo Shubin','DA-02',3,122,True)
-#put_data(3,'Alexander Kovalenko','DA-02',3,122,True)
-#get_number_of_rows()
-#alter_table()
-#show_data()
-#delete_data(1)
-#show_data()
-#exit()
+
