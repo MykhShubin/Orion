@@ -162,6 +162,69 @@ def log_in():
         if access == 1:
             print("Try again!")
 
+def add_student():
+    arr = []
+    arr.append(str(len(hbase_kursova.conn.tables())+1))
+    str1 = ""
+    print("Enter name of student")
+    str1 = input()
+    arr.append(str1)
+    print("Enter group")
+    str1 = input()
+    arr.append(str1)
+    print("Enter speciality")
+    str1 = input()
+    arr.append(str1)
+    print("Enter year of studing")
+    str1 = input()
+    arr.append(str1)
+    print("Enter 1 if student do public work if dont enter 0")
+    str1 = input()
+    arr.append(str1)
+    print("Enter subjects through a space")
+    str1 = input()
+    arr.append(str1)
+    print("Enter grades for it through a space(from 1 to 5)")
+    str1 = input()
+    arr.append(str1)
+    print("Enter subjects for session through a space")
+    str1 = input()
+    arr.append(str1)
+    print("Enter grades for it through a space(from 1 to 5)")
+    str1 = input()
+    arr.append(str1)
+
+    arr_subjects = arr[6].split(' ')
+    arr_subjects_grades = arr[7].split(' ')
+    arr_subjects_session = arr[8].split(' ')
+    arr_subjects_session_grades = arr[9].split(' ')
+    session_grade = 0
+    hbase_kursova.create_table(str(arr[0]), "grades")
+    for i in range(len(arr_subjects)):
+        hbase_kursova.put_data(arr[0],arr_subjects[i],"grades","main_grade",arr_subjects_grades[i])
+    for i in range(len(arr_subjects_session)):
+        hbase_kursova.put_data(arr[0],arr_subjects_session[i],"grades","session_grade",arr_subjects_session_grades[i])
+        session_grade += int(arr_subjects_session_grades[i])
+
+    session_grade /= len(arr_subjects_session)
+    temp =[]
+    temp.append(hbase_kursova.read_data(str(arr[0])))
+    couchdb_kursova.write_student_data(arr[0], arr[1],session_grade, 0,0)
+    get_academic_performance(temp)
+    number_of_sesion_subject(temp)
+    bol = True
+    if(arr[5] ==1):
+        bol = True
+    else:
+        bol = False
+    postgreSQL.put_data(int(arr[0]),arr[1],arr[2],int(arr[4]),int(arr[3]),bol)
+
+def delete_student():
+    print("Enter id of student for delete")
+    id = input()
+    hbase_kursova.delete_table(id)
+    couchdb_kursova.delete_student_data(id)
+    postgreSQL.delete_data(int(id))
 
 def menu():
     print("\n[1] Scolarships by group")
@@ -169,6 +232,8 @@ def menu():
     print("[3] List of students for deduction")
     print('[4] List of group with middle number')
     print("[5] List of all students by name")
+    print("[6] Add new student")
+    print("[7] Delete student")
     print("[0] Exit the program\n")
 
 
@@ -198,7 +263,7 @@ hbase_kursova.read_all_data(arr_studiens_hbase)
 print(number_of_sesion_subject(arr_studiens_hbase))
 #UI
 
-log_in()
+#log_in()
 menu()
 option = int(input("Enter your option: "))
 #option = 4;
@@ -224,12 +289,22 @@ while option != 0:
     elif option == 5:#[5] List of all students by name
         show_all_stu_names()
 
+    elif option == 6:
+        add_student()
+        arr_studiens_hbase = []
+        hbase_kursova.read_all_data(arr_studiens_hbase)
+
+    elif option == 7:
+        delete_student()
+        arr_studiens_hbase = []
+        hbase_kursova.read_all_data(arr_studiens_hbase)
+
     else:#[0] Exit the program
         print("Invalid option.")
 
     menu()
-    #option = int(input("Enter your option: "))
-    option = 0;
+    option = int(input("Enter your option: "))
+    #option = 0;
 
 for i in range(1,12):
     couchdb_kursova.delete_student_data(str(i))
