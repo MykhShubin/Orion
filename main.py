@@ -17,6 +17,10 @@ class student:
         self.subjects = subjects
         self.subjects_sesiion = subjects_sesiion
 
+class login:
+    def __init__(self, log:str, password:str):
+        self.log = log
+        self.password = password
 
 def creating_tables_and_adding_data(array):
     postgreSQL.create_db()
@@ -44,8 +48,8 @@ def get_academic_performance(arr_studiens_hbase):
         srednii_bal[i.id] = number
         docum = couchdb_kursova.copy_doc(str(i.id))
         couchdb_kursova.delete_student_data(str(i.id))
-        couchdb_kursova.write_student_data(docum["doc_id"],docum["name"],
-        docum["session_grade"],number,docum["kolichestvo_ekzameniv"])
+        couchdb_kursova.write_student_data(docum["doc_id"], docum["name"],
+        docum["session_grade"], number, docum["kolichestvo_ekzameniv"])
     return srednii_bal
 
 
@@ -56,8 +60,8 @@ def number_of_sesion_subject(arr_studiens_hbase):
         postgreSQL.fill_ex_num(i.id, number_of_subjects)
         docum = couchdb_kursova.copy_doc(str(i.id))
         couchdb_kursova.delete_student_data(str(i.id))
-        couchdb_kursova.write_student_data(docum["doc_id"],docum["name"],
-        docum["session_grade"],docum["average_grade"],number_of_subjects)
+        couchdb_kursova.write_student_data(docum["doc_id"], docum["name"],
+        docum["session_grade"], docum["average_grade"], number_of_subjects)
         arr.append(number_of_subjects)
     num = max(arr)
     return num
@@ -124,6 +128,7 @@ def find_students_for_deduction(arr_studiens_hbase):
         counter = Counter(values)
         if counter[2] > 2:
             print(postgreSQL.get_data(stu.id)[1])
+            return postgreSQL.get_data(stu.id)[1]
 
 
 def find_middle_grade_of_group(group, grades):
@@ -134,7 +139,29 @@ def find_middle_grade_of_group(group, grades):
             srednii_bal_for_group += grades[i]
             number_of_students += 1
     srednii_bal_for_group /= number_of_students
+    srednii_bal_for_group = format(srednii_bal_for_group, '.2f')
     return srednii_bal_for_group
+
+def log_in():
+    login_arr = [login("1@mail.com", "password1"),
+                 login("2@mail.com", "password2"),
+                 login("3@mail.com", "password3")]
+    access = 0
+    while access == 0 or access == 1:
+        dat1 = str(input("Enter your login: "))
+        dat2 = str(input("Enter your password: "))
+        #dat1 = '1@mail.com';dat2 = 'password1'
+        for i in login_arr:
+            if dat1 == i.log and dat2 == i.password:
+                print("Login successful!")
+                access = 2
+                break
+            else:
+                access = 1
+                continue
+        if access == 1:
+            print("Try again!")
+
 
 def menu():
     print("\n[1] Scolarships by group")
@@ -164,27 +191,23 @@ array = [student("Oleksandr", 1, "DA-02", 122, 3, 0, True, {"tik": 5, "sbd": 5, 
          student("Kiril", 10, "DA-12", 122, 2, 0, True, {"os": 3, "algoritms": 4}, {"algoritms": 5}),
          student("Anna", 11, "DA-12", 122, 2, 0, True, {"os": 3, "algoritms": 4}, {"algoritms": 5}),]
 
-
 hbase_kursova.delete_all_tables()
 creating_tables_and_adding_data(array)
 arr_studiens_hbase = []
-#postgreSQL.show_data()
 hbase_kursova.read_all_data(arr_studiens_hbase)
-number_of_sesion_subject(arr_studiens_hbase)
-
-#print(number_of_sesion_subject(arr_studiens_hbase))
-
+print(number_of_sesion_subject(arr_studiens_hbase))
 #UI
+
+log_in()
 menu()
 option = int(input("Enter your option: "))
+#option = 4;
 while option != 0:
     if option == 1:#[1] Scolarships by group
-        #number_of_exams = number_of_sesion_subject(arr_studiens_hbase)
         give_scholarship(arr_studiens_hbase)
         show_scol_list()
 
     elif option == 2:#[2] List of students by group and their grades
-        #show_group_list()
         show_alph_by_group()
 
     elif option == 3:#[3] List of students for deduction
@@ -193,6 +216,7 @@ while option != 0:
 
     elif option == 4:#4] List of group with middle number
         srednii_bal = get_academic_performance(arr_studiens_hbase)
+        print(srednii_bal)
         print('Middle grade for group DA-01 -', find_middle_grade_of_group("DA-01", srednii_bal))
         print('Middle grade for group DA-02 -', find_middle_grade_of_group("DA-02", srednii_bal))
         print('Middle grade for group DA-12 -', find_middle_grade_of_group("DA-12", srednii_bal))
@@ -204,8 +228,8 @@ while option != 0:
         print("Invalid option.")
 
     menu()
-    option = int(input("Enter your option: "))
-
+    #option = int(input("Enter your option: "))
+    option = 0;
 
 for i in range(1,12):
     couchdb_kursova.delete_student_data(str(i))
