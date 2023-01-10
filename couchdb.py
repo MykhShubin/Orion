@@ -38,7 +38,12 @@ def delete_student_data(doc_id):
     except couchdb.http.ResourceNotFound:
         print("Data with doc_id {} not found".format(doc_id))
 
-
+def view_all_data():
+    # Get all documents in the database
+    for doc_id in db:
+        doc = db[doc_id]
+        print("Data with doc_id {}: {}".format(doc_id, doc))
+view_all_data()
 
 # write some data to the database
 write_student_data("s1", "John Smith", 75, 85)
