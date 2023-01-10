@@ -1,4 +1,4 @@
-# import couchdb_kursova
+import couchdb_kursova
 import hbase_kursova
 import postgreSQL
 from collections import Counter
@@ -21,14 +21,18 @@ class student:
 def creating_tables_and_adding_data(array):
     postgreSQL.create_db()
     postgreSQL.alter_table()
+
     for i in array:
         postgreSQL.put_data(i.id, i.name, i.group, i.year, i.speciality, i.pub_work)
         hbase_kursova.create_table(str(i.id), "grades")
+        number = 0
+        for key, value in i.subjects_sesiion.items():
+            number = i.subjects_sesiion[key]
+        couchdb_kursova.write_student_data(str(i.id), i.name, number, i.srednii_bal,0)
         for main_subject, grage in i.subjects.items():
             hbase_kursova.put_data(str(i.id), main_subject, "grades", "main_grade", str(grage))
         for session_subject, grage in i.subjects_sesiion.items():
             hbase_kursova.put_data(str(i.id), session_subject, "grades", "session_grade", str(grage))
-
 
 def get_academic_performance(arr_studiens_hbase):
     srednii_bal = {}
@@ -38,16 +42,22 @@ def get_academic_performance(arr_studiens_hbase):
             number += value
         number = number / len(i.subjects)
         srednii_bal[i.id] = number
+        docum = couchdb_kursova.copy_doc(str(i.id))
+        couchdb_kursova.delete_student_data(str(i.id))
+        couchdb_kursova.write_student_data(docum["doc_id"],docum["name"],
+        docum["session_grade"],number,docum["kolichestvo_ekzameniv"])
     return srednii_bal
 
 
 def number_of_sesion_subject(arr_studiens_hbase):
     arr = []
     for i in arr_studiens_hbase:
-        print('lol')
         number_of_subjects = len(i.session_subjects)
-        print(number_of_subjects)
         postgreSQL.fill_ex_num(i.id, number_of_subjects)
+        docum = couchdb_kursova.copy_doc(str(i.id))
+        couchdb_kursova.delete_student_data(str(i.id))
+        couchdb_kursova.write_student_data(docum["doc_id"],docum["name"],
+        docum["session_grade"],docum["average_grade"],number_of_subjects)
         arr.append(number_of_subjects)
     num = max(arr)
     return num
@@ -154,17 +164,15 @@ array = [student("Oleksandr", 1, "DA-02", 122, 3, 0, True, {"tik": 5, "sbd": 5, 
          student("Kiril", 10, "DA-12", 122, 2, 0, True, {"os": 3, "algoritms": 4}, {"algoritms": 5}),
          student("Anna", 11, "DA-12", 122, 2, 0, True, {"os": 3, "algoritms": 4}, {"algoritms": 5}),]
 
+
 hbase_kursova.delete_all_tables()
 creating_tables_and_adding_data(array)
 arr_studiens_hbase = []
 #postgreSQL.show_data()
 hbase_kursova.read_all_data(arr_studiens_hbase)
-'''for i in arr_studiens_hbase:
-    print("id is ", i.id, " dict 1 is ", i.subjects, " dict 2 is ", i.session_subjects)
-#for key, value in srednii_bal.items():
-    #postgreSQL.fill_scol(value, key)
-# средний бал должен быть флоат, в массиве в мейне он флоат а уже в sql инт
-# postgreSQL.show_data()'''
+number_of_sesion_subject(arr_studiens_hbase)
+
+#print(number_of_sesion_subject(arr_studiens_hbase))
 
 #UI
 menu()
@@ -198,6 +206,9 @@ while option != 0:
     menu()
     option = int(input("Enter your option: "))
 
+
+for i in range(1,12):
+    couchdb_kursova.delete_student_data(str(i))
 hbase_kursova.delete_all_tables()
 postgreSQL.exit()
 print("Thank you for using this program!")
