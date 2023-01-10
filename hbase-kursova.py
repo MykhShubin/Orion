@@ -5,7 +5,7 @@ conn.open()
 
 class student:
     def __init__(self,id):
-        self.id = id
+        self.id = int(id)
         self.subjects = {}
         self.session_subjects = {}
     
@@ -57,8 +57,8 @@ def delete_all_tables():
     for i in conn.tables():
         delete_table(i)
 
-# # delete_table("1")
-# # delete_table("2")
+# delete_table("1")
+# delete_table("2")
 # create_table("1","grades")
 # create_table("2","grades")
 # #print(conn.tables())
@@ -70,7 +70,7 @@ def delete_all_tables():
 
 
 # sstu = read_data("1")
-# print(sstu.id,sstu.subjects,sstu.session_subjects)
+# #print(sstu.id,sstu.subjects,sstu.session_subjects)
 # # for i in array_of_subjectes:
 # #     print("name is ", i.name, " main grade is ",i.main_grade," session grade is ", i.sesion_grade)
 # array = []
