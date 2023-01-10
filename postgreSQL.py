@@ -75,7 +75,7 @@ def fill_ex_num(id:int,ex_num:int):
     cursor.execute('UPDATE students SET EX_NUM = %s WHERE ID = %s',(ex_num,id,))
 
 def fill_liv(id:int,liv:bool):
-    cursor.execute('UPDATE students SET LIV = %s WHERE ID = %s',(liv,id,))
+    cursor.execute('UPDATE students SET LIV = %s WHERE ID = %s',(AsIs(liv),id,))
 
 def fill_scol(scol:int,id:int):
     cursor.execute('UPDATE students SET SCOLARSHIP = %s WHERE ID = %s', (scol, id,))
@@ -107,10 +107,11 @@ def order_alph():
     FROM students
     ORDER BY FULL_NAME ASC''')
     cursor.execute('SELECT * FROM sorted_students')
-    #cursor.execute('SELECT * FROM students ORDER BY FULL_NAME DESC NULLS LAST')
     mlist = cursor.fetchall()
     cursor.execute('DROP VIEW IF EXISTS sorted_students')
     return mlist
 
 cursor = conn.cursor()
+
+
 
