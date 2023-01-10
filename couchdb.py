@@ -1,41 +1,52 @@
-import couchdb # Імпортуємо бібліотеку для роботи з CouchDB
+import couchdb
 
-# Підключаємося до CouchDB
-couch = couchdb.Server("http://localhost:5984/%22)
+couch = couchdb.Server('http://couchdb:couchdb@localhost:5984')
+#couch.delete('university')
+#db = couch.create('university')
+#couch.delete('university')
+db = couch['student']
 
-# Створюємо базу даних "Університет"
-db = couch.create("university")
-
-# Функція для запису даних про студента
-def write_student_data(name, session_grade, average_grade):
+#couch.delete('university')
+def write_student_data(doc_id, name, session_grade, average_grade):
     # Створюємо новий документ у базі даних
     doc = {
+        "doc_id": doc_id,
         "name": name,
         "session_grade": session_grade,
         "average_grade": average_grade
     }
-    db.save(doc) # Зберігаємо документ у базі даних
+    db[doc_id] = doc
+    print("Data with doc_id {}: {}".format(doc_id, doc))
+def read_student_data(doc_id):
+    try:
+        # Шукаємо документ з заданим doc_id
+        doc = db.get(doc_id)
+        print("Data with doc_id {}: {}".format(doc_id, doc))
+    except couchdb.http.ResourceNotFound:
+        print("Data with doc_id {} not found".format(doc_id))
 
-# Функція для видалення даних про студента
 def delete_student_data(doc_id):
-    doc = db
-    doc = db[doc_id]
-    db.delete(doc)  # Видаляємо документ з бази даних
-    # Виводимо інформацію про студента
-    print("Name:", doc["name"])
-    print("Session grade:", doc["session_grade"])
-    print("Average grade:", doc["average_grade"])
+    try:
+        # Шукаємо документ з заданим doc_id
+        doc = db.get(doc_id)
+        if doc is None:
+            print("Document with doc_id {} not found".format(doc_id))
+        else:
+            # Видаляємо документ з бази даних
+            db.delete(doc)
+            print("Data with doc_id {} is deleted".format(doc_id))
+    except couchdb.http.ResourceNotFound:
+        print("Data with doc_id {} not found".format(doc_id))
 
-# Функція для читання даних про студентів зі середньою оцінкою більшою за задане значення
-def read_students_with_average_grade_greater_than(average_grade):
-    # Виконуємо запит до бази даних
-    results = db.view("students/by_average_grade", startkey=average_grade, inclusive_end=False)
-    for result in results:
-        doc = result.value # Отримуємо документ з результату
-        # Виводимо інформацію про студента
-        print("Name:", doc["name"])
-        print("Session grade:", doc["session_grade"])
-        print("Average grade:", doc["average_grade"])
 
-def exit_database():
-    couch.close()
+
+# write some data to the database
+write_student_data("s1", "John Smith", 75, 85)
+write_student_data("s2", "Jane Doe", 80, 90)
+
+# read data from the database
+read_student_data("s1")
+
+# delete data from the database
+delete_student_data("s1")
+
