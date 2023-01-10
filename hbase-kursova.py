@@ -41,7 +41,7 @@ def read_data(table_name):
 def read_all_data(array):
     arr_hbase = conn.tables()
     for i in arr_hbase:
-        student1 = read_data(i)
+        student1 = read_data(i.decode())
         array.append(student1)
         
 
